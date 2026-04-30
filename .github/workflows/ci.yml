@@ -1,0 +1,73 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  integration-tests:
+    name: dbt build (dbt-duckdb ${{ matrix.dbt-duckdb-version }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    strategy:
+      fail-fast: false
+      matrix:
+        dbt-duckdb-version:
+          - "1.9.0"     # floor — oldest supported (per VALIDATION.md spike)
+          - "1.10.1"    # latest stable at planning time
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+
+      - name: Install dbt-duckdb (matrix version)
+        run: |
+          uv venv
+          uv pip install "dbt-duckdb==${{ matrix.dbt-duckdb-version }}"
+          echo "$GITHUB_WORKSPACE/.venv/bin" >> "$GITHUB_PATH"
+
+      - name: dbt deps
+        working-directory: integration_tests
+        run: dbt deps --profiles-dir .
+
+      - name: dbt seed
+        working-directory: integration_tests
+        run: dbt seed --profiles-dir . --target ci
+
+      - name: dbt build (run + test in one process — required for file-backed lifecycle)
+        working-directory: integration_tests
+        run: dbt build --profiles-dir . --target ci
+
+      - name: dbt build (re-run — verifies CREATE OR REPLACE idempotency)
+        working-directory: integration_tests
+        run: dbt build --profiles-dir . --target ci
+
+      - name: Upload target/ on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dbt-target-${{ matrix.dbt-duckdb-version }}
+          path: integration_tests/target/
+          if-no-files-found: ignore
+          retention-days: 7

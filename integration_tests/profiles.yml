@@ -1,0 +1,17 @@
+integration_tests:
+  target: dev
+  outputs:
+    dev:
+      type: duckdb
+      path: ":memory:"
+      threads: 1
+      extensions:
+        - name: semantic_views
+          repo: community
+    ci:
+      type: duckdb
+      path: target/test.duckdb
+      threads: 1
+      extensions:
+        - name: semantic_views
+          repo: community

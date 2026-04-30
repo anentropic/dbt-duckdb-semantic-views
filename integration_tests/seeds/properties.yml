@@ -1,0 +1,15 @@
+version: 2
+
+seeds:
+  - name: raw_orders
+    config:
+      column_types:
+        order_id: integer
+        region_id: integer
+        amount: decimal(10,2)
+        order_date: date
+  - name: raw_regions
+    config:
+      column_types:
+        region_id: integer
+        region_name: varchar
