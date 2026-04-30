@@ -9,6 +9,22 @@ Mirrors the macro shape of [`Snowflake-Labs/dbt_semantic_view`](https://github.c
 - `dbt-core >= 1.0.0, < 2.0.0`
 - `dbt-duckdb >= 1.9.0` (tested against `1.10.1`)
 - DuckDB extension `semantic_views >= 0.7.1` (auto-installed by `dbt-duckdb` via `extensions:` config — see below)
+- A **stable** `duckdb` Python package (e.g. `duckdb==1.5.2`) — see "Known issue" below
+
+### Known issue: dbt-duckdb ships a duckdb pre-release
+
+At the time of v0.1.0 release, `dbt-duckdb` 1.9.x and 1.10.x both pin a `duckdb` pre-release (`1.6.0.devN`). The DuckDB community-extensions build matrix only publishes binaries for **stable** duckdb releases, so `INSTALL semantic_views FROM community` fails with HTTP 404 against the dev pre-release.
+
+Workaround: pin a stable `duckdb` version alongside `dbt-duckdb` in your project. For example, in your `pyproject.toml` or `requirements.txt`:
+
+```
+dbt-duckdb>=1.9.0
+duckdb==1.5.2
+```
+
+dbt-duckdb tolerates a co-installed stable duckdb. This package's CI matrix exercises this configuration.
+
+When upstream dbt-duckdb starts shipping with a stable duckdb again, the explicit `duckdb` pin can be removed.
 
 ## Install
 

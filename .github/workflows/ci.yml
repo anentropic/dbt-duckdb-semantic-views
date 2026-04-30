@@ -42,9 +42,17 @@ jobs:
           enable-cache: true
 
       - name: Install dbt-duckdb (matrix version)
+        # Pin a stable `duckdb` alongside dbt-duckdb. dbt-duckdb 1.9.x and
+        # 1.10.x both ship a duckdb pre-release (1.6.0.devN) for which the
+        # community-extensions CDN has no published builds, so
+        # `INSTALL semantic_views FROM community` returns HTTP 404.
+        # Forcing a stable duckdb (1.5.2 — latest stable at v0.1.0 release)
+        # makes community extensions installable.
+        # See: https://community-extensions.duckdb.org/ (only stable duckdb
+        # commits get extension binaries built).
         run: |
           uv venv
-          uv pip install "dbt-duckdb==${{ matrix.dbt-duckdb-version }}"
+          uv pip install "dbt-duckdb==${{ matrix.dbt-duckdb-version }}" "duckdb==1.5.2"
           echo "$GITHUB_WORKSPACE/.venv/bin" >> "$GITHUB_PATH"
 
       - name: dbt deps
