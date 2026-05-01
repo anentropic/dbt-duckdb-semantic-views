@@ -5,10 +5,10 @@ TABLES (
   regions AS {{ ref('raw_regions') }} PRIMARY KEY (region_id)
 )
 RELATIONSHIPS (
-  orders(region_id) REFERENCES regions(region_id)
+  order_region AS orders(region_id) REFERENCES regions
 )
 FACTS (
-  orders.amount AS amount
+  orders.line_amount AS amount
 )
 DIMENSIONS (
   regions.region_name AS region_name

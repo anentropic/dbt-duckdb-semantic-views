@@ -24,7 +24,7 @@ jobs:
       fail-fast: false
       matrix:
         dbt-duckdb-version:
-          - "1.9.0"     # floor — oldest supported (per VALIDATION.md spike)
+          - "1.10.0"    # floor — oldest supported (see README "Known issues")
           - "1.10.1"    # latest stable at planning time
 
     steps:
@@ -42,8 +42,8 @@ jobs:
           enable-cache: true
 
       - name: Install dbt-duckdb (matrix version)
-        # Pin a stable `duckdb` alongside dbt-duckdb. dbt-duckdb 1.9.x and
-        # 1.10.x both ship a duckdb pre-release (1.6.0.devN) for which the
+        # Pin a stable `duckdb` alongside dbt-duckdb. dbt-duckdb 1.10.x
+        # ships a duckdb pre-release (1.6.0.devN) for which the
         # community-extensions CDN has no published builds, so
         # `INSTALL semantic_views FROM community` returns HTTP 404.
         # Forcing a stable duckdb (1.5.2 — latest stable at v0.1.0 release)

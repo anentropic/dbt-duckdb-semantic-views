@@ -1,10 +1,11 @@
 -- Asserts that semantic_view('sem_orders_simple', ...) returns the expected aggregates.
 -- Per dbt singular test convention: any rows returned == failure.
+-- depends_on: {{ ref('sem_orders_simple') }}
 
 with results as (
   select region_id, total_amount, order_count
   from semantic_view(
-    'sem_orders_simple',
+    '{{ target.database }}.{{ target.schema }}.sem_orders_simple',
     dimensions := ['region_id'],
     metrics := ['total_amount', 'order_count']
   )

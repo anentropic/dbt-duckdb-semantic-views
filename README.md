@@ -7,24 +7,28 @@ Mirrors the macro shape of [`Snowflake-Labs/dbt_semantic_view`](https://github.c
 ## Requirements
 
 - `dbt-core >= 1.0.0, < 2.0.0`
-- `dbt-duckdb >= 1.9.0` (tested against `1.10.1`)
+- `dbt-duckdb >= 1.10.0` (tested against `1.10.0` and `1.10.1`)
 - DuckDB extension `semantic_views >= 0.7.1` (auto-installed by `dbt-duckdb` via `extensions:` config — see below)
 - A **stable** `duckdb` Python package (e.g. `duckdb==1.5.2`) — see "Known issue" below
 
 ### Known issue: dbt-duckdb ships a duckdb pre-release
 
-At the time of v0.1.0 release, `dbt-duckdb` 1.9.x and 1.10.x both pin a `duckdb` pre-release (`1.6.0.devN`). The DuckDB community-extensions build matrix only publishes binaries for **stable** duckdb releases, so `INSTALL semantic_views FROM community` fails with HTTP 404 against the dev pre-release.
+At the time of v0.1.0 release, `dbt-duckdb` 1.10.x pins a `duckdb` pre-release (`1.6.0.devN`). The DuckDB community-extensions build matrix only publishes binaries for **stable** duckdb releases, so `INSTALL semantic_views FROM community` fails with HTTP 404 against the dev pre-release.
 
 Workaround: pin a stable `duckdb` version alongside `dbt-duckdb` in your project. For example, in your `pyproject.toml` or `requirements.txt`:
 
 ```
-dbt-duckdb>=1.9.0
+dbt-duckdb>=1.10.0
 duckdb==1.5.2
 ```
 
 dbt-duckdb tolerates a co-installed stable duckdb. This package's CI matrix exercises this configuration.
 
 When upstream dbt-duckdb starts shipping with a stable duckdb again, the explicit `duckdb` pin can be removed.
+
+### Known issue: dbt-duckdb 1.9.0 is not supported
+
+The originally-intended floor of `dbt-duckdb >= 1.9.0` was dropped during v0.1.0 hardening. With the only stable `duckdb` that has a published `semantic_views` community-extension build (`duckdb==1.5.2`), `dbt-duckdb 1.9.0` deadlocks during connection initialisation against a file-backed database. `dbt-duckdb >= 1.10.0` works correctly.
 
 ## Install
 
@@ -64,6 +68,7 @@ Note: the field is `repo:`, not `repository:`. dbt-duckdb installs and loads the
 
 TABLES (
   orders AS {{ ref('stg_orders') }} PRIMARY KEY (order_id)
+    COMMENT = 'Orders semantic view'
 )
 DIMENSIONS (
   orders.region_id AS region_id
@@ -71,7 +76,6 @@ DIMENSIONS (
 METRICS (
   orders.total_amount AS sum(amount)
 )
-COMMENT = 'Orders semantic view'
 ```
 
 The first table in `TABLES(...)` must be the base/fact table; all other tables are reachable via `RELATIONSHIPS(...)`. See the [extension docs](https://anentropic.github.io/duckdb-semantic-views/) for full DDL grammar.

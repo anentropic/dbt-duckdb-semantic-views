@@ -1,8 +1,9 @@
 -- Asserts that joining via RELATIONSHIPS returns per-region rollups by region_name.
+-- depends_on: {{ ref('sem_orders_relationships') }}
 with results as (
   select region_name, total_amount, order_count
   from semantic_view(
-    'sem_orders_relationships',
+    '{{ target.database }}.{{ target.schema }}.sem_orders_relationships',
     dimensions := ['region_name'],
     metrics := ['total_amount', 'order_count']
   )

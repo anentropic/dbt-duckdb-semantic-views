@@ -10,7 +10,9 @@ METRICS (
   orders.total_amount AS sum(amount)
 )
 MATERIALIZATIONS (
-  AGGREGATIONS (
-    sum(amount) GROUP BY region_id
+  region_agg AS (
+    TABLE pre_aggregated_revenue_by_region,
+    DIMENSIONS (region_id),
+    METRICS (total_amount)
   )
 )
