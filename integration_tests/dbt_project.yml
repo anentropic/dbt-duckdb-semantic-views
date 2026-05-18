@@ -7,11 +7,6 @@ flags:
 
 profile: 'integration_tests'
 
-quoting:
-  database: false
-  schema: false
-  identifier: false
-
 model-paths: ["models"]
 seed-paths: ["seeds"]
 test-paths: ["tests"]

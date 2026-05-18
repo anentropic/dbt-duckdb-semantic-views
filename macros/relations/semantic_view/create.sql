@@ -42,14 +42,23 @@
       identifier=identifier, schema=schema, database=database,
       type='view') -%}
 
-  {{ run_hooks(pre_hooks) }}
+  {{ run_hooks(pre_hooks, inside_transaction=False) }}
+
+  -- `BEGIN` happens here:
+  {{ run_hooks(pre_hooks, inside_transaction=True) }}
 
   -- build model
   {% call statement('main') -%}
     {{ duckdb_semantic_views.duckdb__get_create_semantic_view_sql(target_relation, sql) }}
   {%- endcall %}
 
-  {{ run_hooks(post_hooks) }}
+  {{ run_hooks(post_hooks, inside_transaction=True) }}
+
+  -- `COMMIT` happens here — required under semantic_views v0.8.0+ transactional DDL semantics:
+  -- https://anentropic.github.io/duckdb-semantic-views/explanation/transactional-ddl-and-limitations.html
+  {{ adapter.commit() }}
+
+  {{ run_hooks(post_hooks, inside_transaction=False) }}
 
   {{ return({'relations': [target_relation]}) }}
 
