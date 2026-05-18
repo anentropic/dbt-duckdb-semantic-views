@@ -4,27 +4,21 @@ A dbt package that registers a `semantic_view` materialisation for [`dbt-duckdb`
 
 Mirrors the macro shape of [`Snowflake-Labs/dbt_semantic_view`](https://github.com/Snowflake-Labs/dbt_semantic_view) so the same dbt model body shape works on both warehouses.
 
+## Release notes
+
+See [CHANGELOG.md](./CHANGELOG.md) for full history.
+
+### v0.2.0 (2026-05-18)
+
+- Extension floor bumped to `semantic_views >= 0.9.0`.
+- Materialisation macro now issues an explicit commit, required under extension v0.8.0+ transactional-DDL semantics.
+- **Consumers can now drop the project-level `quoting: { database: false, schema: false, identifier: false }` workaround** that was suggested for v0.1.0 — extension v0.9.0 stores FQNs unquoted, so the workaround is no longer needed.
+
 ## Requirements
 
 - `dbt-core >= 1.0.0, < 2.0.0`
 - `dbt-duckdb >= 1.10.0` (tested against `1.10.0` and `1.10.1`)
-- DuckDB extension `semantic_views >= 0.7.1` (auto-installed by `dbt-duckdb` via `extensions:` config — see below)
-- A **stable** `duckdb` Python package (e.g. `duckdb==1.5.2`) — see "Known issue" below
-
-### Known issue: dbt-duckdb ships a duckdb pre-release
-
-At the time of v0.1.0 release, `dbt-duckdb` 1.10.x pins a `duckdb` pre-release (`1.6.0.devN`). The DuckDB community-extensions build matrix only publishes binaries for **stable** duckdb releases, so `INSTALL semantic_views FROM community` fails with HTTP 404 against the dev pre-release.
-
-Workaround: pin a stable `duckdb` version alongside `dbt-duckdb` in your project. For example, in your `pyproject.toml` or `requirements.txt`:
-
-```
-dbt-duckdb>=1.10.0
-duckdb==1.5.2
-```
-
-dbt-duckdb tolerates a co-installed stable duckdb. This package's CI matrix exercises this configuration.
-
-When upstream dbt-duckdb starts shipping with a stable duckdb again, the explicit `duckdb` pin can be removed.
+- DuckDB extension `semantic_views >= 0.9.0` (auto-installed by `dbt-duckdb` via `extensions:` config — see below)
 
 ### Known issue: dbt-duckdb 1.9.0 is not supported
 
@@ -37,7 +31,7 @@ Add to your project's `packages.yml`:
 ```yaml
 packages:
   - package: anentropic/duckdb_semantic_views
-    version: 0.1.0
+    version: 0.2.0
 ```
 
 Then run `dbt deps`.
