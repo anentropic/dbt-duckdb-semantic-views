@@ -18,11 +18,16 @@ See [CHANGELOG.md](./CHANGELOG.md) for full history.
 
 - `dbt-core >= 1.0.0, < 2.0.0`
 - `dbt-duckdb >= 1.10.0` (tested against `1.10.0` and `1.10.1`)
-- DuckDB extension `semantic_views >= 0.9.0` (auto-installed by `dbt-duckdb` via `extensions:` config — see below)
+- DuckDB extension `semantic_views >= 0.9.0` (auto-installed by `dbt-duckdb` via `extensions:` config — see below). Verified against `v0.10.2` on `duckdb==1.5.3`.
+
+> **Note on `v0.10.0+`:** extension `v0.10.0` removed primary-key auto-inference from
+> catalog constraints — you must declare `PRIMARY KEY (...)` explicitly in every
+> `TABLES(...)` entry (as the example below does). Models that relied on implicit
+> PK inference under `v0.9.x` must add an explicit `PRIMARY KEY`.
 
 ### Known issue: dbt-duckdb 1.9.0 is not supported
 
-The originally-intended floor of `dbt-duckdb >= 1.9.0` was dropped during v0.1.0 hardening. With the only stable `duckdb` that has a published `semantic_views` community-extension build (`duckdb==1.5.2`), `dbt-duckdb 1.9.0` deadlocks during connection initialisation against a file-backed database. `dbt-duckdb >= 1.10.0` works correctly.
+The originally-intended floor of `dbt-duckdb >= 1.9.0` was dropped during v0.1.0 hardening. `dbt-duckdb 1.9.0` deadlocks during connection initialisation against a file-backed database when paired with the stable `duckdb` that carries a published `semantic_views` community-extension build. `dbt-duckdb >= 1.10.0` works correctly. (As of 2026-06, `dbt-duckdb 1.10.x` resolves `duckdb==1.5.3`, which carries the extension `v0.10.2` build; the earlier `duckdb==1.5.2` build is also still supported.)
 
 ## Install
 
