@@ -8,6 +8,15 @@ Mirrors the macro shape of [`Snowflake-Labs/dbt_semantic_view`](https://github.c
 
 See [CHANGELOG.md](./CHANGELOG.md) for full history.
 
+### v0.3.0 (2026-06-09)
+
+- Extension floor bumped to `semantic_views >= 0.10.2` (requires `duckdb == 1.5.3`).
+- **Breaking:** extension `v0.10.0` removed primary-key auto-inference, so every
+  `TABLES(...)` entry must now declare an explicit `PRIMARY KEY (...)`. Models that
+  relied on implicit PK inference under `v0.9.x` must be updated.
+- Verified end-to-end against extension `v0.10.2` on `duckdb 1.5.3` (file-backed,
+  idempotent, `list_semantic_views()` populated).
+
 ### v0.2.0 (2026-05-18)
 
 - Extension floor bumped to `semantic_views >= 0.9.0`.
@@ -18,11 +27,17 @@ See [CHANGELOG.md](./CHANGELOG.md) for full history.
 
 - `dbt-core >= 1.0.0, < 2.0.0`
 - `dbt-duckdb >= 1.10.0` (tested against `1.10.0` and `1.10.1`)
-- DuckDB extension `semantic_views >= 0.9.0` (auto-installed by `dbt-duckdb` via `extensions:` config — see below)
+- `duckdb == 1.5.3` (the `semantic_views` community-extension build is duckdb-version-specific; `v0.10.2` targets `1.5.3`)
+- DuckDB extension `semantic_views >= 0.10.2` (auto-installed by `dbt-duckdb` via `extensions:` config — see below). Verified against `v0.10.2` on `duckdb 1.5.3`.
+
+> **Breaking from `v0.10.0`:** the extension removed primary-key auto-inference from
+> catalog constraints — you must declare `PRIMARY KEY (...)` explicitly in every
+> `TABLES(...)` entry (as the example below does). Models that relied on implicit
+> PK inference under `v0.9.x` must add an explicit `PRIMARY KEY`.
 
 ### Known issue: dbt-duckdb 1.9.0 is not supported
 
-The originally-intended floor of `dbt-duckdb >= 1.9.0` was dropped during v0.1.0 hardening. With the only stable `duckdb` that has a published `semantic_views` community-extension build (`duckdb==1.5.2`), `dbt-duckdb 1.9.0` deadlocks during connection initialisation against a file-backed database. `dbt-duckdb >= 1.10.0` works correctly.
+The originally-intended floor of `dbt-duckdb >= 1.9.0` was dropped during v0.1.0 hardening. `dbt-duckdb 1.9.0` deadlocks during connection initialisation against a file-backed database when paired with the stable `duckdb` that carries a published `semantic_views` community-extension build. `dbt-duckdb >= 1.10.0` works correctly. As of 2026-06, `dbt-duckdb 1.10.x` resolves `duckdb == 1.5.3`, which carries the extension `v0.10.2` build.
 
 ## Install
 
@@ -31,7 +46,7 @@ Add to your project's `packages.yml`:
 ```yaml
 packages:
   - package: anentropic/duckdb_semantic_views
-    version: 0.2.0
+    version: 0.3.0
 ```
 
 Then run `dbt deps`.

@@ -44,7 +44,11 @@ jobs:
       - name: Install dbt-duckdb (matrix version)
         run: |
           uv venv
-          uv pip install "dbt-duckdb==${{ matrix.dbt-duckdb-version }}"
+          # Pin duckdb==1.5.3 explicitly: the semantic_views community-extension
+          # build is duckdb-version-specific, and v0.10.x targets 1.5.3. Pinning
+          # keeps CI deterministic (avoids floating onto a duckdb release with no
+          # published extension build, which 404s on auto-install).
+          uv pip install "dbt-duckdb==${{ matrix.dbt-duckdb-version }}" "duckdb==1.5.3"
           echo "$GITHUB_WORKSPACE/.venv/bin" >> "$GITHUB_PATH"
 
       - name: dbt deps

@@ -5,6 +5,27 @@ All notable changes to this package will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0] — 2026-06-09
+
+### Changed
+
+- Extension floor bumped to `semantic_views >= 0.10.2`. This build targets
+  `duckdb == 1.5.3` (the community-extension build is duckdb-version-specific;
+  `duckdb 1.5.2` builds do not load on `1.5.3` and vice-versa). The CI matrix
+  now pins `duckdb==1.5.3` so it deterministically exercises the `v0.10.2` build.
+- Verified end-to-end against extension `v0.10.2` on `duckdb 1.5.3`: the
+  integration suite passes on the file-backed target, `list_semantic_views()`
+  is populated, and the `CREATE OR REPLACE` idempotency re-run is clean.
+
+### Breaking
+
+- Extension `v0.10.0` removed primary-key auto-inference from catalog
+  constraints. Every `TABLES(...)` entry must now declare an explicit
+  `PRIMARY KEY (...)`. Consumers who relied on implicit PK inference under
+  `semantic_views v0.9.x` must add an explicit `PRIMARY KEY` to each table
+  before upgrading. The materialisation macro is unchanged — this is an
+  extension-grammar requirement surfaced through the floor bump.
+
 ## [0.2.0] — 2026-05-18
 
 ### Changed
