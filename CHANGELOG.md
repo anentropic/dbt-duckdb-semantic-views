@@ -36,7 +36,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `semantic_views` extension v0.8.0+, where semantic-view DDL became fully
   transactional rather than autocommit. Without this commit, the DDL never
   lands in the on-disk catalog and `list_semantic_views()` returns empty.
-  See: <https://anentropic.github.io/duckdb-semantic-views/explanation/transactional-ddl-and-limitations.html>
+  See: <https://s-layer.github.io/duckdb-semantic-views/explanation/transactional-ddl-and-limitations.html>
 - Extension floor bumped to `semantic_views >= 0.9.0`. v0.9.0 includes the
   FQN-quoting fix in catalog storage — introspection queries now resolve
   `semantic_view('name', ...)` correctly without project-level quoting
