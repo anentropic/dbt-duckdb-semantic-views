@@ -26,7 +26,7 @@
 --      A valid DDL statement which will result in a new DuckDB semantic view.
 --      Note: DuckDB requires the `AS` keyword between the relation and the body
 --      (Snowflake's grammar elides `AS`). See:
---      https://anentropic.github.io/duckdb-semantic-views/docs/reference/create-semantic-view.html
+--      https://s-layer.github.io/duckdb-semantic-views/docs/reference/create-semantic-view.html
 -#}
 
   create or replace semantic view {{ relation }} as
@@ -55,7 +55,7 @@
   {{ run_hooks(post_hooks, inside_transaction=True) }}
 
   -- `COMMIT` happens here — required under semantic_views v0.8.0+ transactional DDL semantics:
-  -- https://anentropic.github.io/duckdb-semantic-views/explanation/transactional-ddl-and-limitations.html
+  -- https://s-layer.github.io/duckdb-semantic-views/explanation/transactional-ddl-and-limitations.html
   {{ adapter.commit() }}
 
   {{ run_hooks(post_hooks, inside_transaction=False) }}

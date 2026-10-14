@@ -1,6 +1,6 @@
 # dbt-duckdb-semantic-views
 
-A dbt package that registers a `semantic_view` materialisation for [`dbt-duckdb`](https://github.com/duckdb/dbt-duckdb) backed by the [`duckdb-semantic-views`](https://github.com/anentropic/duckdb-semantic-views) DuckDB extension.
+A dbt package that registers a `semantic_view` materialisation for [`dbt-duckdb`](https://github.com/duckdb/dbt-duckdb) backed by the [`duckdb-semantic-views`](https://github.com/s-layer/duckdb-semantic-views) DuckDB extension.
 
 Mirrors the macro shape of [`Snowflake-Labs/dbt_semantic_view`](https://github.com/Snowflake-Labs/dbt_semantic_view) so the same dbt model body shape works on both warehouses.
 
@@ -87,7 +87,7 @@ METRICS (
 )
 ```
 
-The first table in `TABLES(...)` must be the base/fact table; all other tables are reachable via `RELATIONSHIPS(...)`. See the [extension docs](https://anentropic.github.io/duckdb-semantic-views/) for full DDL grammar.
+The first table in `TABLES(...)` must be the base/fact table; all other tables are reachable via `RELATIONSHIPS(...)`. See the [extension docs](https://s-layer.github.io/duckdb-semantic-views/) for full DDL grammar.
 
 ## How it works
 
