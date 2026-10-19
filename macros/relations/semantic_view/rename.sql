@@ -1,4 +1,4 @@
--- Copyright 2026 Paul Anenotropic
+-- Copyright 2026 Anentropic
 -- SPDX-License-Identifier: Apache-2.0
 --
 -- Licensed under the Apache License, Version 2.0 (the "License");
