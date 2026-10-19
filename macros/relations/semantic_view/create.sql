@@ -1,4 +1,4 @@
--- Copyright 2026 Paul Anenotropic
+-- Copyright 2026 Anentropic
 -- SPDX-License-Identifier: Apache-2.0
 --
 -- Licensed under the Apache License, Version 2.0 (the "License");
@@ -26,7 +26,7 @@
 --      A valid DDL statement which will result in a new DuckDB semantic view.
 --      Note: DuckDB requires the `AS` keyword between the relation and the body
 --      (Snowflake's grammar elides `AS`). See:
---      https://s-layer.github.io/duckdb-semantic-views/docs/reference/create-semantic-view.html
+--      https://s-layer.github.io/duckdb-semantic-views/reference/create-semantic-view.html
 -#}
 
   create or replace semantic view {{ relation }} as
