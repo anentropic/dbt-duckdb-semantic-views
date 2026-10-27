@@ -5,6 +5,27 @@ All notable changes to this package will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Changed
+
+- Moved to DuckDB 2.0. The package now requires `duckdb == 2.0.0` and extension
+  `semantic_views >= 0.17.0`. Extension `v0.15.0` onwards runs only on DuckDB 2.0,
+  so stay on `v0.2.0` with extension `v0.14.x` if you need DuckDB 1.5. The CI matrix
+  pins `duckdb==2.0.0` and covers `dbt-duckdb` 1.10.0 (with `dbt-core` 1.8) and 1.11.1.
+- `require-dbt-version` is now `>=1.8.0`, the oldest `dbt-core` that `dbt-duckdb`
+  1.10 installs with. It was `>=1.0.0`.
+- From extension `v0.17.0`, `CREATE SEMANTIC VIEW` binds every table and member, so a
+  model whose body names a missing table or column fails at `dbt run` instead of at
+  query time.
+- The README installs the package from git, since it is not on the dbt Package Hub yet.
+
+### Added
+
+- Integration tests for reading a semantic view downstream through `ref()`: a table
+  model that queries it with standard SQL (`GROUP BY` dimensions, `AGG(metric)`,
+  `WHERE` on a fact), and a test that uses the `SEMANTIC_VIEW(...)` construct.
+
 ## [0.3.0] — 2026-06-09
 
 ### Changed

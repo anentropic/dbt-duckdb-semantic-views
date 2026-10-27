@@ -16,16 +16,23 @@ permissions:
 
 jobs:
   integration-tests:
-    name: dbt build (dbt-duckdb ${{ matrix.dbt-duckdb-version }})
+    name: dbt build (dbt-duckdb ${{ matrix.dbt-duckdb-version }}, dbt-core ${{ matrix.dbt-core-label }})
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
     strategy:
       fail-fast: false
       matrix:
-        dbt-duckdb-version:
-          - "1.10.0"    # floor — oldest supported (see README "Known issues")
-          - "1.10.1"    # latest stable at planning time
+        include:
+          # floor: oldest dbt-duckdb (see README "Known issues") with the oldest
+          # dbt-core it installs with, matching require-dbt-version
+          - dbt-duckdb-version: "1.10.0"
+            dbt-core-label: "1.8"
+            dbt-core-spec: "dbt-core==1.8.*"
+          # latest stable dbt-duckdb, with whatever dbt-core it resolves
+          - dbt-duckdb-version: "1.11.1"
+            dbt-core-label: "latest"
+            dbt-core-spec: "dbt-core"
 
     steps:
       - name: Checkout
@@ -44,11 +51,11 @@ jobs:
       - name: Install dbt-duckdb (matrix version)
         run: |
           uv venv
-          # Pin duckdb==1.5.3 explicitly: the semantic_views community-extension
-          # build is duckdb-version-specific, and v0.10.x targets 1.5.3. Pinning
-          # keeps CI deterministic (avoids floating onto a duckdb release with no
-          # published extension build, which 404s on auto-install).
-          uv pip install "dbt-duckdb==${{ matrix.dbt-duckdb-version }}" "duckdb==1.5.3"
+          # Pin duckdb==2.0.0 explicitly: the semantic_views community-extension
+          # build is duckdb-version-specific, and v0.15.0+ runs only on DuckDB 2.0.
+          # Pinning keeps CI deterministic (avoids floating onto a duckdb release
+          # with no published extension build, which 404s on auto-install).
+          uv pip install "dbt-duckdb==${{ matrix.dbt-duckdb-version }}" "${{ matrix.dbt-core-spec }}" "duckdb==2.0.0"
           echo "$GITHUB_WORKSPACE/.venv/bin" >> "$GITHUB_PATH"
 
       - name: dbt deps
