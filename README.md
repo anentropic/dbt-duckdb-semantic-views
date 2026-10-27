@@ -8,6 +8,12 @@ Mirrors the macro shape of [`Snowflake-Labs/dbt_semantic_view`](https://github.c
 
 See [CHANGELOG.md](./CHANGELOG.md) for full history.
 
+### Unreleased
+
+- Moves to DuckDB 2.0: requires `duckdb == 2.0.0` and extension `semantic_views >= 0.17.0`.
+- Downstream models can query a semantic view through `ref()` with standard SQL or
+  `SEMANTIC_VIEW(...)`.
+
 ### v0.3.0 (2026-06-09)
 
 - Extension floor bumped to `semantic_views >= 0.10.2` (requires `duckdb == 1.5.3`).
@@ -25,28 +31,47 @@ See [CHANGELOG.md](./CHANGELOG.md) for full history.
 
 ## Requirements
 
-- `dbt-core >= 1.0.0, < 2.0.0`
-- `dbt-duckdb >= 1.10.0` (tested against `1.10.0` and `1.10.1`)
-- `duckdb == 1.5.3` (the `semantic_views` community-extension build is duckdb-version-specific; `v0.10.2` targets `1.5.3`)
-- DuckDB extension `semantic_views >= 0.10.2` (auto-installed by `dbt-duckdb` via `extensions:` config — see below). Verified against `v0.10.2` on `duckdb 1.5.3`.
+- `dbt-core >= 1.8.0, < 2.0.0` (tested against `1.8` and the latest release)
+- `dbt-duckdb >= 1.10.0` (tested against `1.10.0` and `1.11.1`)
+- `duckdb == 2.0.0`. The `semantic_views` community-extension build is
+  duckdb-version-specific, and extension `v0.15.0` onwards runs only on DuckDB 2.0.
+  On DuckDB 1.5, stay on this package's `v0.3.0`, which also works with extension
+  `v0.14.2` on `duckdb 1.5.6`.
+- DuckDB extension `semantic_views >= 0.17.0` (auto-installed by `dbt-duckdb` via
+  `extensions:` config, see below). Verified against `v0.17.0` on `duckdb 2.0.0`.
+  `dbt-duckdb` does not upgrade an extension that is already installed, so if you
+  installed an older build on DuckDB 2.0, run `FORCE INSTALL semantic_views FROM community;`
+  (or `UPDATE EXTENSIONS;`) once before you upgrade.
 
-> **Breaking from `v0.10.0`:** the extension removed primary-key auto-inference from
-> catalog constraints — you must declare `PRIMARY KEY (...)` explicitly in every
-> `TABLES(...)` entry (as the example below does). Models that relied on implicit
-> PK inference under `v0.9.x` must add an explicit `PRIMARY KEY`.
+Every `TABLES(...)` entry must declare an explicit `PRIMARY KEY (...)` (extension
+`v0.10.0` removed primary-key inference), and from extension `v0.17.0` every table
+and member must bind when the view is created, so the tables it references must
+already exist. `ref()` makes dbt build them first.
 
 ### Known issue: dbt-duckdb 1.9.0 is not supported
 
-The originally-intended floor of `dbt-duckdb >= 1.9.0` was dropped during v0.1.0 hardening. `dbt-duckdb 1.9.0` deadlocks during connection initialisation against a file-backed database when paired with the stable `duckdb` that carries a published `semantic_views` community-extension build. `dbt-duckdb >= 1.10.0` works correctly. As of 2026-06, `dbt-duckdb 1.10.x` resolves `duckdb == 1.5.3`, which carries the extension `v0.10.2` build.
+`dbt-duckdb 1.9.0` deadlocks during connection initialisation against a file-backed
+database when paired with a `duckdb` that carries a published `semantic_views` build.
+Use `dbt-duckdb >= 1.10.0`.
 
 ## Install
 
-Add to your project's `packages.yml`:
+The package is not on the dbt Package Hub yet. Install it from git in your project's
+`packages.yml`:
 
 ```yaml
 packages:
-  - package: anentropic/duckdb_semantic_views
-    version: 0.3.0
+  - git: https://github.com/s-layer/dbt-duckdb-semantic-views
+    revision: main
+```
+
+`main` tracks the latest code, which needs DuckDB 2.0. To stay on DuckDB 1.5, pin the
+last release for it instead:
+
+```yaml
+packages:
+  - git: https://github.com/s-layer/dbt-duckdb-semantic-views
+    revision: v0.3.0
 ```
 
 Then run `dbt deps`.
@@ -98,6 +123,34 @@ CREATE OR REPLACE SEMANTIC VIEW <relation> AS <model body>
 ```
 
 and ships `drop`/`rename` lifecycle macros that map to the DuckDB extension's DDL.
+
+## Query a semantic view downstream
+
+Downstream models can read a semantic view through `ref()`. With extension `v0.17.0`
+you can use standard SQL: `GROUP BY` names the dimensions and `AGG()` wraps each metric.
+
+```sql
+-- models/orders_by_region.sql
+{{ config(materialized='table') }}
+
+select region_id, agg(total_amount) as total_amount
+from {{ ref('sem_orders') }}
+group by region_id
+```
+
+The `SEMANTIC_VIEW(...)` construct works too:
+
+```sql
+select *
+from SEMANTIC_VIEW(
+  {{ ref('sem_orders') }}
+  DIMENSIONS orders.region_id
+  METRICS orders.total_amount
+)
+```
+
+`SELECT *` straight from a semantic view is refused: name the dimensions and metrics
+you want. See the extension docs for the full query rules.
 
 ## License
 
