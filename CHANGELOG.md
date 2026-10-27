@@ -11,7 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Moved to DuckDB 2.0. The package now requires `duckdb == 2.0.0` and extension
   `semantic_views >= 0.17.0`. Extension `v0.15.0` onwards runs only on DuckDB 2.0,
-  so stay on `v0.2.0` with extension `v0.14.x` if you need DuckDB 1.5. The CI matrix
+  so stay on `v0.3.0` if you need DuckDB 1.5 (verified with extension
+  `v0.14.2` on `duckdb 1.5.6`). The CI matrix
   pins `duckdb==2.0.0` and covers `dbt-duckdb` 1.10.0 (with `dbt-core` 1.8) and 1.11.1.
 - `require-dbt-version` is now `>=1.8.0`, the oldest `dbt-core` that `dbt-duckdb`
   1.10 installs with. It was `>=1.0.0`.

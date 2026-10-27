@@ -31,13 +31,17 @@ See [CHANGELOG.md](./CHANGELOG.md) for full history.
 
 ## Requirements
 
-- `dbt-core >= 1.8.0, < 2.0.0` (tested against `1.8` and `1.12`)
+- `dbt-core >= 1.8.0, < 2.0.0` (tested against `1.8` and the latest release)
 - `dbt-duckdb >= 1.10.0` (tested against `1.10.0` and `1.11.1`)
 - `duckdb == 2.0.0`. The `semantic_views` community-extension build is
   duckdb-version-specific, and extension `v0.15.0` onwards runs only on DuckDB 2.0.
-  On DuckDB 1.5, stay on this package's `v0.2.0` with extension `v0.14.x`.
+  On DuckDB 1.5, stay on this package's `v0.3.0`, which also works with extension
+  `v0.14.2` on `duckdb 1.5.6`.
 - DuckDB extension `semantic_views >= 0.17.0` (auto-installed by `dbt-duckdb` via
   `extensions:` config, see below). Verified against `v0.17.0` on `duckdb 2.0.0`.
+  `dbt-duckdb` does not upgrade an extension that is already installed, so if you
+  installed an older build on DuckDB 2.0, run `FORCE INSTALL semantic_views FROM community;`
+  (or `UPDATE EXTENSIONS;`) once before you upgrade.
 
 Every `TABLES(...)` entry must declare an explicit `PRIMARY KEY (...)` (extension
 `v0.10.0` removed primary-key inference), and from extension `v0.17.0` every table
@@ -59,6 +63,15 @@ The package is not on the dbt Package Hub yet. Install it from git in your proje
 packages:
   - git: https://github.com/s-layer/dbt-duckdb-semantic-views
     revision: main
+```
+
+`main` tracks the latest code, which needs DuckDB 2.0. To stay on DuckDB 1.5, pin the
+last release for it instead:
+
+```yaml
+packages:
+  - git: https://github.com/s-layer/dbt-duckdb-semantic-views
+    revision: v0.3.0
 ```
 
 Then run `dbt deps`.
